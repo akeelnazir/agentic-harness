@@ -3,7 +3,7 @@ import { Harness } from './harness/harness.ts';
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 export const agenticLoop = (harness: Harness) => {
@@ -14,12 +14,15 @@ export const agenticLoop = (harness: Harness) => {
       return;
     }
 
-    harness.processQuery(answer).then((response: string) => {
-      console.log(`Agent: ${response}\n`);
-      agenticLoop(harness);
-    }).catch((error: Error) => {
-      console.error(`Error: ${error.message}\n`);
-      agenticLoop(harness);
-    });
+    harness
+      .processQuery(answer)
+      .then((response: string) => {
+        console.log(`Agent: ${response}\n`);
+        agenticLoop(harness);
+      })
+      .catch((error: Error) => {
+        console.error(`Error: ${error.message}\n`);
+        agenticLoop(harness);
+      });
   });
 };

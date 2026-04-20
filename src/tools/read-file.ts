@@ -15,8 +15,8 @@ export async function readFromFile(filepath: string): Promise<ReadResult> {
         success: false,
         content: null,
         filepath,
-        message: `Cannot read file: ${filepath}, only files with the following extensions can be read: ${allowedTypes.join(', ')}`
-      }
+        message: `Cannot read file: ${filepath}, only files with the following extensions can be read: ${allowedTypes.join(', ')}`,
+      };
     }
 
     if (filepath.startsWith('/') || filepath.includes('..')) {
@@ -24,8 +24,8 @@ export async function readFromFile(filepath: string): Promise<ReadResult> {
         success: false,
         content: null,
         filepath,
-        message: `Cannot read file: ${filepath}, only files in the current folder can be read for security reasons`
-      }
+        message: `Cannot read file: ${filepath}, only files in the current folder can be read for security reasons`,
+      };
     }
 
     console.log(`[READ] Reading from file: ${filepath}`);
@@ -38,7 +38,7 @@ export async function readFromFile(filepath: string): Promise<ReadResult> {
       success: true,
       message: `Successfully read ${filepath}`,
       content,
-      filepath
+      filepath,
     };
   } catch (error) {
     console.error(`[READ] Error reading file:`, error);
@@ -47,7 +47,7 @@ export async function readFromFile(filepath: string): Promise<ReadResult> {
       success: false,
       message: `Failed to read file: ${errorMessage}`,
       content: null,
-      filepath
+      filepath,
     };
   }
 }

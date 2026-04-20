@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { executeTool } from '../tools/tool-executor.ts';
 import type { ChatCompletionMessageParam } from '../types/types.ts';
-import { LLMHOST_HOST, DEFAULT_MODEL, MAX_ITERATIONS, } from '../config.ts';
+import { LLMHOST_HOST, DEFAULT_MODEL, MAX_ITERATIONS } from '../config.ts';
 import { TOOLS } from '../tools/tools-definition.ts';
 import { systemPrompt } from './system-prompt.ts';
 
@@ -51,20 +51,26 @@ export class Harness {
         if (!choice) throw new Error('No choices returned from model');
         const message = choice.message;
 
-        console.log(`[LLMHOST RESPONSE] finish_reason: ${choice.finish_reason}`);
+        console.log(
+          `[LLMHOST RESPONSE] finish_reason: ${choice.finish_reason}`
+        );
 
         if (!message.tool_calls || message.tool_calls.length === 0) {
           console.log(`[NO TOOL CALL] Returning final response`);
           return message.content ?? '';
         }
 
-        console.log(`[TOOL CALLS] ${message.tool_calls.length} tool call(s) requested`);
+        console.log(
+          `[TOOL CALLS] ${message.tool_calls.length} tool call(s) requested`
+        );
         messages.push(message);
 
         for (const toolCall of message.tool_calls) {
           if (toolCall.type !== 'function') continue;
           const { id, function: fn } = toolCall;
-          console.log(`[TOOL CALL] id=${id} name=${fn.name} args=${fn.arguments}`);
+          console.log(
+            `[TOOL CALL] id=${id} name=${fn.name} args=${fn.arguments}`
+          );
 
           const toolResult = await executeTool(fn.name, fn.arguments);
 
@@ -75,11 +81,14 @@ export class Harness {
           });
         }
 
-        console.log(`[TOOL RESULTS] Added to conversation history, continuing...`);
+        console.log(
+          `[TOOL RESULTS] Added to conversation history, continuing...`
+        );
         continue;
       } catch (error) {
         console.error('Error generating response from LLMHOST:', error);
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         throw new Error(`Failed to generate response: ${errorMessage}`);
       }
     }

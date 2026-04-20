@@ -4,7 +4,10 @@ import type { RepositoryContext } from '../types/types.ts';
 
 function loadPackageJson(): Partial<RepositoryContext> {
   try {
-    const content = readFileSync(resolve(process.cwd(), 'package.json'), 'utf-8');
+    const content = readFileSync(
+      resolve(process.cwd(), 'package.json'),
+      'utf-8'
+    );
     const pkg = JSON.parse(content);
     return {
       name: pkg.name || 'unknown',
@@ -28,9 +31,14 @@ function loadPackageJson(): Partial<RepositoryContext> {
   }
 }
 
-function loadTsConfig(): { target: string; module: string; strict: boolean } | undefined {
+function loadTsConfig():
+  | { target: string; module: string; strict: boolean }
+  | undefined {
   try {
-    const content = readFileSync(resolve(process.cwd(), 'tsconfig.json'), 'utf-8');
+    const content = readFileSync(
+      resolve(process.cwd(), 'tsconfig.json'),
+      'utf-8'
+    );
     const config = JSON.parse(content);
     return {
       target: config.compilerOptions?.target || 'ES2020',
@@ -61,10 +69,14 @@ export function loadRepositoryContext(): RepositoryContext {
 export function formatRepositoryContext(ctx: RepositoryContext): string {
   const lines: string[] = [];
 
-  lines.push(`Project: ${ctx.name} v${ctx.version} (${ctx.type === 'module' ? 'ESM' : 'CommonJS'})`);
+  lines.push(
+    `Project: ${ctx.name} v${ctx.version} (${ctx.type === 'module' ? 'ESM' : 'CommonJS'})`
+  );
 
   if (ctx.typescript) {
-    lines.push(`Language: TypeScript (target: ${ctx.typescript.target}, module: ${ctx.typescript.module}, strict: ${ctx.typescript.strict})`);
+    lines.push(
+      `Language: TypeScript (target: ${ctx.typescript.target}, module: ${ctx.typescript.module}, strict: ${ctx.typescript.strict})`
+    );
   }
 
   if (ctx.dependencies.length > 0) {

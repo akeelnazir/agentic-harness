@@ -1,5 +1,5 @@
 export type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
-export type { ChatCompletionTool} from 'openai/resources/chat/completions';
+export type { ChatCompletionTool } from 'openai/resources/chat/completions';
 
 export interface ReadResult {
   success: boolean;
@@ -22,9 +22,11 @@ export interface RepositoryContext {
   dependencies: string[];
   devDependencies: string[];
   scripts: Record<string, string>;
-  typescript: {
-    target: string;
-    module: string;
-    strict: boolean;
-  } | undefined;
+  typescript:
+    | {
+        target: string;
+        module: string;
+        strict: boolean;
+      }
+    | undefined;
 }

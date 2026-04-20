@@ -1,4 +1,7 @@
-import { loadRepositoryContext, formatRepositoryContext } from './context-loader.ts';
+import {
+  loadRepositoryContext,
+  formatRepositoryContext,
+} from './context-loader.ts';
 
 const repoContext = loadRepositoryContext();
 const repoContextStr = formatRepositoryContext(repoContext);
