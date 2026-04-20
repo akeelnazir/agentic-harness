@@ -44,6 +44,8 @@ export class Harness {
           model: this.model,
           messages: messages,
           tools: TOOLS,
+          parallel_tool_calls: true,
+          temperature: 0.2,
           stream: false,
         });
 
