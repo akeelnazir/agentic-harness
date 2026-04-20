@@ -1,3 +1,8 @@
+export interface Prompt {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+}
+
 export interface ReadResult {
   success: boolean;
   message: string;

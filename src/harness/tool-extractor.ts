@@ -2,7 +2,7 @@ import type { ToolRequest } from '../types/index.ts';
 
 /**
  * Extract tool requests from LLM response
- * Format: [SEARCH: query] or [STOCK: ticker] or [WRITE: filename | content]
+ * Format: [READ: filename]
  */
 export function extractToolRequests(response: string): ToolRequest[] {
   console.log(`[TOOL EXTRACTION] Analyzing response for tool calls...`);

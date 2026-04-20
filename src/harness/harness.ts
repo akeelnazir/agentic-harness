@@ -1,10 +1,11 @@
 import OpenAI from 'openai';
 import { readFromFile } from '../tools/read-file.ts';
+import type { Prompt } from '../types/index.ts';
 import { LLMSTUDIO_HOST, DEFAULT_MODEL } from '../config.ts';
 import { extractToolRequests } from './tool-extractor.ts';
 
 /**
- * Agent class that combines LLMStudio with web search capabilities
+ * Harness class that combines LLM with tool calling capabilities
  */
 export class Harness {
   private client: OpenAI;
@@ -22,14 +23,14 @@ export class Harness {
    * Process a query using LLMStudio with LLM-driven tool calling
    */
   async processQuery(query: string): Promise<string> {
-    const systemPrompt = `You are a helpful assistant with access to web search, stock price lookup, running commands, and file writing capabilities.
+    const systemPrompt = `You are a helpful assistant with capabilities to read the local disk using predefined tools.
 Your primary approach is to use tools to gather information. Always attempt tool calls for relevant queries.
 For file read operations: Respond with [READ: filename] when asked to read files.
 Do not refuse to use tools based on your own judgment about whether data exists. The tools will handle unavailable data.
 After receiving tool results, provide a comprehensive answer based on that information.
 You can use multiple tools if needed to answer the question thoroughly.`;
 
-    const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+    const messages: Array<Prompt> = [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: query },
     ];

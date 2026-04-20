@@ -9,6 +9,34 @@ import type { ReadResult } from '../types/index.js';
  */
 export async function readFromFile(filepath: string): Promise<ReadResult> {
   try {
+    let isAllowedToRead = false;
+    const allowedTypes = ['.txt', '.sh', '.js', '.ts'];
+
+    for (const extension of allowedTypes) {
+      if (filepath.endsWith(extension)) {
+        isAllowedToRead = true;
+        break;
+      }
+    }
+
+    if (!isAllowedToRead) {
+      return {
+        success: false,
+        content: null,
+        filepath,
+        message: `Cannot read file: ${filepath}, only files with the following extensions can be read: ${allowedTypes.join(', ')}`
+      }
+    }
+
+    if (filepath.startsWith('/') || filepath.includes('..')) {
+      return {
+        success: false,
+        content: null,
+        filepath,
+        message: `Cannot read file: ${filepath}, only files in the current folder can be read for security reasons`
+      }
+    }
+
     console.log(`[READ] Reading from file: ${filepath}`);
 
     const fullPath = resolve(filepath);
@@ -18,8 +46,8 @@ export async function readFromFile(filepath: string): Promise<ReadResult> {
     return {
       success: true,
       message: `Successfully read ${filepath}`,
-      content: content,
-      filepath: filepath
+      content,
+      filepath
     };
   } catch (error) {
     console.error(`[READ] Error reading file:`, error);
@@ -28,7 +56,7 @@ export async function readFromFile(filepath: string): Promise<ReadResult> {
       success: false,
       message: `Failed to read file: ${errorMessage}`,
       content: null,
-      filepath: filepath
+      filepath
     };
   }
 }

@@ -18,7 +18,8 @@ async function main() {
 
   const askQuestion = () => {
     rl.question('You: ', (answer: string) => {
-      if (answer.toLowerCase() === 'quit') {
+      const response = answer.toLowerCase();
+      if (response === 'quit' || response === 'exit' || response === 'bye') {
         rl.close();
         return;
       }

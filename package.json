@@ -1,22 +1,22 @@
 {
-  "name": "agentic-2",
+  "name": "agentic-harness",
   "version": "1.0.0",
-  "description": "",
+  "description": "Agentic Harness for developing AI agents",
+  "author": "Akeel Nazir <akeel@akeelnazir.com>",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/main.ts"
   },
   "keywords": [],
-  "author": "",
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "dotenv": "^17.4.0",
-    "openai": "^4.104.0"
+    "dotenv": "^17.4.2",
+    "openai": "^6.34.0"
   },
   "devDependencies": {
-    "@types/node": "^25.5.2",
+    "@types/node": "^25.6.0",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.2"
+    "typescript": "^6.0.3"
   }
 }
