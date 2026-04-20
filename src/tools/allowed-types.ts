@@ -44,12 +44,17 @@ export const allowedTypes = [
 ];
 
 export function isAllowedType(filename: string): boolean {
+  if (!filename || typeof filename !== 'string') {
+    return false;
+  }
+
   const lowerFilename = filename.toLowerCase();
   return allowedTypes.some((type) => {
-    if (type.startsWith('.')) {
-      return lowerFilename.endsWith(type);
+    const lowerType = type.toLowerCase();
+    if (lowerType.startsWith('.')) {
+      return lowerFilename.endsWith(lowerType);
     } else {
-      return lowerFilename === type;
+      return lowerFilename === lowerType;
     }
   });
 }

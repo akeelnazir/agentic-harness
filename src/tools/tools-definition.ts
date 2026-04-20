@@ -33,7 +33,7 @@ export const TOOLS: ChatCompletionTool[] = [
           command: {
             type: 'string',
             description:
-              'The shell command to execute. For example, "ls -la" or "npm install".',
+              'The shell command to execute. For example, "ls -la", "npm install", "mkdir new-folder".',
           },
           timeout: {
             type: 'number',
@@ -46,4 +46,29 @@ export const TOOLS: ChatCompletionTool[] = [
       strict: true,
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'write_file',
+      description:
+        'Write content to a file on the local disk. Use this tool to create or update files.',
+      parameters: {
+        type: 'object',
+        properties: {
+          filename: {
+            type: 'string',
+            description:
+              'The name or relative path of the file to write. For example, "data/output.txt" or "notes.md".',
+          },
+          content: {
+            type: 'string',
+            description:
+              'The content to write to the file.',
+          },
+        },
+        required: ['filename', 'content'],
+      },
+      strict: true,
+    },
+  }
 ];

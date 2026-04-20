@@ -8,6 +8,13 @@ export interface ReadResult {
   filepath: string;
 }
 
+export interface WriteResult {
+  success: boolean;
+  message: string;
+  filename: string;
+  mode: 'created' | 'appended';
+}
+
 export interface ToolRequest {
   type: 'read';
   value: string;
@@ -23,12 +30,12 @@ export interface RepositoryContext {
   devDependencies: string[];
   scripts: Record<string, string>;
   typescript:
-    | {
-        target: string;
-        module: string;
-        strict: boolean;
-      }
-    | undefined;
+  | {
+    target: string;
+    module: string;
+    strict: boolean;
+  }
+  | undefined;
 }
 
 export interface RunShellResult {

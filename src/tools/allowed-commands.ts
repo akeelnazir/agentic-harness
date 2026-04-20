@@ -61,6 +61,9 @@ export const allowedBaseCommands: string[] = [
   // Python
   'python',
   'python3',
+
+  // Folder operations
+  'mkdir',
 ];
 
 // Forbidden argument patterns — matched against the full command string.

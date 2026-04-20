@@ -1,6 +1,7 @@
 import { readFromFile } from './read-file.ts';
 import { runShell } from './run-shell.ts';
 import { isAllowedShellCommand } from './allowed-commands.ts';
+import { writeToFile } from './write-file.ts';
 
 /**
  * Execute a tool call by name and return the result string
@@ -31,6 +32,17 @@ export async function executeTool(name: string, args: string): Promise<string> {
       return shellResult.success
         ? `Command executed successfully: ${shellResult.stdout}`
         : `Failed to execute command: ${shellResult.stderr}`;
+
+    case 'write_file':
+      const { filename: writeFilename, content } = JSON.parse(args) as {
+        filename: string;
+        content: string;
+      };
+      console.log(`[WRITE FILE] Executing write for: "${writeFilename}"`);
+      const writeResult = await writeToFile(writeFilename, content);
+      return writeResult.success
+        ? `File written successfully: ${writeResult.filename}`
+        : `Failed to write file: ${writeResult.message}`;
 
     default:
       return `Unknown tool: ${name}`;

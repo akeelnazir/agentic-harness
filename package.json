@@ -4,7 +4,7 @@
   "description": "Agentic Harness for developing AI agents",
   "author": "Akeel Nazir <akeel@akeelnazir.com>",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --config jest.config.cjs",
     "start": "ts-node src/main.ts",
     "format": "prettier --write src/"
   },
@@ -16,8 +16,13 @@
     "openai": "^6.34.0"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.6.0",
+    "esbuild": "^0.28.0",
+    "esbuild-jest": "^0.5.0",
+    "jest": "^30.3.0",
     "prettier": "^3.8.3",
+    "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   },
