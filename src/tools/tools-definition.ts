@@ -21,4 +21,29 @@ export const TOOLS: ChatCompletionTool[] = [
       strict: true,
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'run_shell',
+      description:
+        'Execute a shell command and return the result. Use this tool to run system commands or scripts.',
+      parameters: {
+        type: 'object',
+        properties: {
+          command: {
+            type: 'string',
+            description:
+              'The shell command to execute. For example, "ls -la" or "npm install".',
+          },
+          timeout: {
+            type: 'number',
+            description:
+              'Maximum execution time in milliseconds (default: 30000).',
+          },
+        },
+        required: ['command'],
+      },
+      strict: true,
+    },
+  },
 ];

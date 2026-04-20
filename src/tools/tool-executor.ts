@@ -1,4 +1,6 @@
 import { readFromFile } from './read-file.ts';
+import { runShell } from './run-shell.ts';
+import { isAllowedShellCommand } from './allowed-commands.ts';
 
 /**
  * Execute a tool call by name and return the result string
@@ -11,8 +13,25 @@ export async function executeTool(name: string, args: string): Promise<string> {
       const readResult = await readFromFile(filename);
       return readResult.success
         ? (readResult.content ??
-            `Successfully read file: ${readResult.filepath}`)
+          `Successfully read file: ${readResult.filepath}`)
         : `Failed to read file: ${readResult.message}`;
+
+    case 'run_shell':
+      const { command, timeout } = JSON.parse(args) as {
+        command: string;
+        timeout?: number;
+      };
+      const { allowed, reason } = isAllowedShellCommand(command);
+      if (!allowed) {
+        console.warn(`[RUN SHELL] Blocked command: ${command} — ${reason}`);
+        return `Command blocked: ${reason}`;
+      }
+      console.log(`[RUN SHELL] Executing: ${command}`);
+      const shellResult = await runShell(command, timeout);
+      return shellResult.success
+        ? `Command executed successfully: ${shellResult.stdout}`
+        : `Failed to execute command: ${shellResult.stderr}`;
+
     default:
       return `Unknown tool: ${name}`;
   }

@@ -30,3 +30,12 @@ export interface RepositoryContext {
       }
     | undefined;
 }
+
+export interface RunShellResult {
+  success: boolean;
+  message: string;
+  stdout: string;
+  stderr: string;
+  exitCode: number | null;
+  command: string;
+}
