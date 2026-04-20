@@ -1,4 +1,4 @@
-import type { ToolRequest } from '../types/index.ts';
+import type { ToolRequest } from '../types/types.ts';
 
 /**
  * Extract tool requests from LLM response

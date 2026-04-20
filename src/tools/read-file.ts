@@ -1,6 +1,7 @@
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
-import type { ReadResult } from '../types/index.js';
+import type { ReadResult } from '../types/types.ts';
+import { allowedTypes, isAllowedType } from './allowed-types.ts';
 
 /**
  * Read content from a file
@@ -9,17 +10,7 @@ import type { ReadResult } from '../types/index.js';
  */
 export async function readFromFile(filepath: string): Promise<ReadResult> {
   try {
-    let isAllowedToRead = false;
-    const allowedTypes = ['.txt', '.sh', '.js', '.ts'];
-
-    for (const extension of allowedTypes) {
-      if (filepath.endsWith(extension)) {
-        isAllowedToRead = true;
-        break;
-      }
-    }
-
-    if (!isAllowedToRead) {
+    if (!isAllowedType(filepath)) {
       return {
         success: false,
         content: null,
