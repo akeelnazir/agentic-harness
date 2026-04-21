@@ -17,7 +17,10 @@ export async function writeToFile(
   try {
     logger.info(`[WRITE] Writing to file: ${filename}`);
 
-    const folderPath = join(process.cwd(), filename.split('/').slice(0, -1).join('/'));
+    const folderPath = join(
+      process.cwd(),
+      filename.split('/').slice(0, -1).join('/')
+    );
     const fullFilename = filename.split('/').pop()!;
     const filePath = join(folderPath, fullFilename);
 
@@ -45,7 +48,10 @@ export async function writeToFile(
     }
 
     if (logger.isDebugEnabled()) {
-      logger.debug('Write file state', { fileExists, contentLength: content.length });
+      logger.debug('Write file state', {
+        fileExists,
+        contentLength: content.length,
+      });
     }
 
     if (fileExists) {
@@ -57,7 +63,7 @@ export async function writeToFile(
         success: true,
         message: `Wrote content to existing file: ${fullFilename}`,
         filename: fullFilename,
-        mode: 'overwrite'
+        mode: 'overwrite',
       };
     } else {
       await writeFile(filePath, content.trim());
@@ -66,7 +72,7 @@ export async function writeToFile(
         success: true,
         message: `Created new file ${fullFilename}`,
         filename: fullFilename,
-        mode: 'created'
+        mode: 'created',
       };
     }
   } catch (error) {
@@ -76,7 +82,7 @@ export async function writeToFile(
       success: false,
       message: `Failed to write file: ${filename} - error: ${errorMessage}`,
       filename,
-      mode: 'created'
+      mode: 'created',
     };
   }
 }

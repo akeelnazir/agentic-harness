@@ -21,7 +21,11 @@ export async function runShell(
     const { stdout, stderr } = await execAsync(command, { timeout });
 
     if (logger.isDebugEnabled()) {
-      logger.debug('Shell command output', { command, stdout: stdout.trim(), stderr: stderr.trim() });
+      logger.debug('Shell command output', {
+        command,
+        stdout: stdout.trim(),
+        stderr: stderr.trim(),
+      });
     }
 
     logger.info(`[RUN COMMAND] Successfully executed: ${command}`);

@@ -75,7 +75,7 @@ export const forbiddenPatterns: RegExp[] = [
   /\bdoas\b/,
 
   // Destructive filesystem
-  /\brm\s+.*-[a-z]*r[a-z]*/i,   // rm -r, rm -rf, rm -fr, etc.
+  /\brm\s+.*-[a-z]*r[a-z]*/i, // rm -r, rm -rf, rm -fr, etc.
   /\bshred\b/,
   /\btruncate\b/,
   /\bdd\b/,
@@ -84,7 +84,7 @@ export const forbiddenPatterns: RegExp[] = [
   /\bparted\b/,
 
   // Dangerous chmod/chown
-  /\bchmod\s+[0-7]*7[0-7][0-7]/,  // chmod 777, 707, etc.
+  /\bchmod\s+[0-7]*7[0-7][0-7]/, // chmod 777, 707, etc.
   /\bchown\b/,
 
   // System service / persistence modification
@@ -116,24 +116,33 @@ export const forbiddenPatterns: RegExp[] = [
   /\beval\b/,
   /;\s*bash\b/,
   /;\s*sh\b/,
-  /\$\(.*\)/,       // command substitution
-  /`[^`]+`/,        // backtick substitution
-  />\s*\/etc\//,    // redirecting into /etc
-  />\s*\/usr\//,    // redirecting into /usr
-  />\s*\/bin\//,    // redirecting into /bin
+  /\$\(.*\)/, // command substitution
+  /`[^`]+`/, // backtick substitution
+  />\s*\/etc\//, // redirecting into /etc
+  />\s*\/usr\//, // redirecting into /usr
+  />\s*\/bin\//, // redirecting into /bin
 ];
 
-export function isAllowedShellCommand(command: string): { allowed: boolean; reason?: string } {
+export function isAllowedShellCommand(command: string): {
+  allowed: boolean;
+  reason?: string;
+} {
   const trimmed = command.trim();
   const baseCommand = trimmed.split(/\s+/)[0]?.toLowerCase() ?? '';
 
   if (!allowedBaseCommands.includes(baseCommand)) {
-    return { allowed: false, reason: `Base command '${baseCommand}' is not in the allowlist` };
+    return {
+      allowed: false,
+      reason: `Base command '${baseCommand}' is not in the allowlist`,
+    };
   }
 
   for (const pattern of forbiddenPatterns) {
     if (pattern.test(trimmed)) {
-      return { allowed: false, reason: `Command matches forbidden pattern: ${pattern}` };
+      return {
+        allowed: false,
+        reason: `Command matches forbidden pattern: ${pattern}`,
+      };
     }
   }
 

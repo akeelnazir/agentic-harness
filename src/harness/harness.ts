@@ -20,7 +20,10 @@ export class Harness {
     });
     this.model = model;
     if (logger.isDebugEnabled()) {
-      logger.debug('Harness initialized', { model: this.model, baseURL: LLMHOST_HOST });
+      logger.debug('Harness initialized', {
+        model: this.model,
+        baseURL: LLMHOST_HOST,
+      });
     }
   }
 
@@ -81,7 +84,9 @@ export class Harness {
         );
         messages.push(message);
         if (logger.isDebugEnabled()) {
-          logger.debug(`Messages stack of length: ${messages.length}`, { messages: JSON.stringify(messages) });
+          logger.debug(`Messages stack of length: ${messages.length}`, {
+            messages: JSON.stringify(messages),
+          });
         }
 
         for (const toolCall of message.tool_calls) {
@@ -93,7 +98,11 @@ export class Harness {
 
           const toolResult = await executeTool(fn.name, fn.arguments);
           if (logger.isDebugEnabled()) {
-            logger.debug('Tool result', { id, name: fn.name, result: JSON.stringify(toolResult) });
+            logger.debug('Tool result', {
+              id,
+              name: fn.name,
+              result: JSON.stringify(toolResult),
+            });
           }
 
           messages.push({

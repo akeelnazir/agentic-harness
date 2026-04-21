@@ -30,7 +30,10 @@ export const agenticLoop = (harness: Harness) => {
       .catch((error: Error) => {
         logger.error(`Error: ${error.message}`);
         if (logger.isDebugEnabled()) {
-          logger.debug('Agent error', { error: error.message, stack: error.stack });
+          logger.debug('Agent error', {
+            error: error.message,
+            stack: error.stack,
+          });
         }
         agenticLoop(harness);
       });

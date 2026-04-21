@@ -18,7 +18,7 @@ export async function executeTool(name: string, args: string): Promise<string> {
       const readResult = await readFromFile(filename);
       return readResult.success
         ? (readResult.content ??
-          `Successfully read file: ${readResult.filepath}`)
+            `Successfully read file: ${readResult.filepath}`)
         : `Failed to read file: ${readResult.message}`;
 
     case 'run_shell':

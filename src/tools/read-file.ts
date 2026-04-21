@@ -38,7 +38,10 @@ export async function readFromFile(filepath: string): Promise<ReadResult> {
     const content = await readFile(fullPath, 'utf-8');
 
     if (logger.isDebugEnabled()) {
-      logger.debug('File read result', { filepath, contentLength: content.length });
+      logger.debug('File read result', {
+        filepath,
+        contentLength: content.length,
+      });
     }
     logger.info(`[READ] Successfully read file: ${filepath}`);
     return {

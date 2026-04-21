@@ -30,12 +30,12 @@ export interface RepositoryContext {
   devDependencies: string[];
   scripts: Record<string, string>;
   typescript:
-  | {
-    target: string;
-    module: string;
-    strict: boolean;
-  }
-  | undefined;
+    | {
+        target: string;
+        module: string;
+        strict: boolean;
+      }
+    | undefined;
 }
 
 export interface RunShellResult {

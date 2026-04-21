@@ -62,13 +62,12 @@ export const TOOLS: ChatCompletionTool[] = [
           },
           content: {
             type: 'string',
-            description:
-              'The content to write to the file.',
+            description: 'The content to write to the file.',
           },
         },
         required: ['filename', 'content'],
       },
       strict: true,
     },
-  }
+  },
 ];
