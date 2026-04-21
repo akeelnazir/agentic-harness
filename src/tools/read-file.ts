@@ -2,6 +2,7 @@ import { readFile } from 'fs/promises';
 import { resolve } from 'path';
 import type { ReadResult } from '../types/types.ts';
 import { allowedTypes, isAllowedType } from './allowed-types.ts';
+import { logger } from '../utils/logger.ts';
 
 /**
  * Read content from a file
@@ -28,12 +29,18 @@ export async function readFromFile(filepath: string): Promise<ReadResult> {
       };
     }
 
-    console.log(`[READ] Reading from file: ${filepath}`);
+    logger.info(`[READ] Reading from file: ${filepath}`);
 
     const fullPath = resolve(filepath);
+    if (logger.isDebugEnabled()) {
+      logger.debug('Resolved file path', { filepath, fullPath });
+    }
     const content = await readFile(fullPath, 'utf-8');
 
-    console.log(`[READ] Successfully read file: ${filepath}`);
+    if (logger.isDebugEnabled()) {
+      logger.debug('File read result', { filepath, contentLength: content.length });
+    }
+    logger.info(`[READ] Successfully read file: ${filepath}`);
     return {
       success: true,
       message: `Successfully read ${filepath}`,
@@ -41,7 +48,7 @@ export async function readFromFile(filepath: string): Promise<ReadResult> {
       filepath,
     };
   } catch (error) {
-    console.error(`[READ] Error reading file:`, error);
+    logger.error(`[READ] Error reading file:`, error);
     const errorMessage = error instanceof Error ? error.message : String(error);
     return {
       success: false,

@@ -2,15 +2,19 @@ import { readFromFile } from './read-file.ts';
 import { runShell } from './run-shell.ts';
 import { isAllowedShellCommand } from './allowed-commands.ts';
 import { writeToFile } from './write-file.ts';
+import { logger } from '../utils/logger.ts';
 
 /**
  * Execute a tool call by name and return the result string
  */
 export async function executeTool(name: string, args: string): Promise<string> {
+  if (logger.isDebugEnabled()) {
+    logger.debug('Executing tool', { name, args });
+  }
   switch (name) {
     case 'read_file':
       const { filename } = JSON.parse(args) as { filename: string };
-      console.log(`[READ FILE] Executing read for: "${filename}"`);
+      logger.info(`[READ FILE] Executing read for: "${filename}"`);
       const readResult = await readFromFile(filename);
       return readResult.success
         ? (readResult.content ??
@@ -24,10 +28,10 @@ export async function executeTool(name: string, args: string): Promise<string> {
       };
       const { allowed, reason } = isAllowedShellCommand(command);
       if (!allowed) {
-        console.warn(`[RUN SHELL] Blocked command: ${command} — ${reason}`);
+        logger.warn(`[RUN SHELL] Blocked command: ${command} — ${reason}`);
         return `Command blocked: ${reason}`;
       }
-      console.log(`[RUN SHELL] Executing: ${command}`);
+      logger.info(`[RUN SHELL] Executing: ${command}`);
       const shellResult = await runShell(command, timeout);
       return shellResult.success
         ? `Command executed successfully: ${shellResult.stdout}`
@@ -38,7 +42,7 @@ export async function executeTool(name: string, args: string): Promise<string> {
         filename: string;
         content: string;
       };
-      console.log(`[WRITE FILE] Executing write for: "${writeFilename}"`);
+      logger.info(`[WRITE FILE] Executing write for: "${writeFilename}"`);
       const writeResult = await writeToFile(writeFilename, content);
       return writeResult.success
         ? `File written successfully: ${writeResult.filename}`

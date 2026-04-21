@@ -4,6 +4,7 @@ import type { ChatCompletionMessageParam } from '../types/types.ts';
 import { LLMHOST_HOST, DEFAULT_MODEL, MAX_ITERATIONS } from '../config.ts';
 import { TOOLS } from '../tools/tools-definition.ts';
 import { systemPrompt } from './system-prompt.ts';
+import { logger } from '../utils/logger.ts';
 
 /**
  * Harness class that combines LLM with tool calling capabilities
@@ -18,6 +19,9 @@ export class Harness {
       apiKey: 'not-needed',
     });
     this.model = model;
+    if (logger.isDebugEnabled()) {
+      logger.debug('Harness initialized', { model: this.model, baseURL: LLMHOST_HOST });
+    }
   }
 
   /**
@@ -31,15 +35,18 @@ export class Harness {
     let iterations = 0;
     const maxIterations = MAX_ITERATIONS;
 
-    console.log(`[QUERY START] Processing: "${query}"`);
-    console.log(`[MODEL] Using: ${this.model}`);
+    logger.info(`[QUERY START] Processing: "${query}"`);
+    logger.info(`[MODEL] Using: ${this.model}`);
 
     while (iterations < maxIterations) {
       iterations++;
-      console.log(`\n[ITERATION ${iterations}/${maxIterations}]`);
+      logger.info(`\n[ITERATION ${iterations}/${maxIterations}]`);
 
       try {
-        console.log(`[LLMHOST REQUEST] Sending prompt to model...`);
+        logger.info(`[LLMHOST REQUEST] Sending prompt to model...`);
+        if (logger.isDebugEnabled()) {
+          logger.debug('LLM request', { model: this.model, messages });
+        }
         const response = await this.client.chat.completions.create({
           model: this.model,
           messages: messages,
@@ -53,28 +60,41 @@ export class Harness {
         if (!choice) throw new Error('No choices returned from model');
         const message = choice.message;
 
-        console.log(
+        logger.info(
           `[LLMHOST RESPONSE] finish_reason: ${choice.finish_reason}`
         );
+        if (logger.isDebugEnabled()) {
+          logger.debug('LLM response', {
+            finish_reason: choice.finish_reason,
+            message,
+            usage: response.usage,
+          });
+        }
 
         if (!message.tool_calls || message.tool_calls.length === 0) {
-          console.log(`[NO TOOL CALL] Returning final response`);
+          logger.info(`[NO TOOL CALL] Returning final response`);
           return message.content ?? '';
         }
 
-        console.log(
+        logger.info(
           `[TOOL CALLS] ${message.tool_calls.length} tool call(s) requested`
         );
         messages.push(message);
+        if (logger.isDebugEnabled()) {
+          logger.debug(`Messages stack of length: ${messages.length}`, { messages: JSON.stringify(messages) });
+        }
 
         for (const toolCall of message.tool_calls) {
           if (toolCall.type !== 'function') continue;
           const { id, function: fn } = toolCall;
-          console.log(
+          logger.info(
             `[TOOL CALL] id=${id} name=${fn.name} args=${fn.arguments}`
           );
 
           const toolResult = await executeTool(fn.name, fn.arguments);
+          if (logger.isDebugEnabled()) {
+            logger.debug('Tool result', { id, name: fn.name, result: JSON.stringify(toolResult) });
+          }
 
           messages.push({
             role: 'tool',
@@ -83,12 +103,12 @@ export class Harness {
           });
         }
 
-        console.log(
+        logger.info(
           `[TOOL RESULTS] Added to conversation history, continuing...`
         );
         continue;
       } catch (error) {
-        console.error('Error generating response from LLMHOST:', error);
+        logger.error('Error generating response from LLMHOST:', error);
         const errorMessage =
           error instanceof Error ? error.message : String(error);
         throw new Error(`Failed to generate response: ${errorMessage}`);

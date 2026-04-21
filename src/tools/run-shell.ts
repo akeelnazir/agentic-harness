@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import type { RunShellResult } from '../types/types.ts';
+import { logger } from '../utils/logger.ts';
 
 const execAsync = promisify(exec);
 
@@ -15,11 +16,15 @@ export async function runShell(
   timeout: number = 30000
 ): Promise<RunShellResult> {
   try {
-    console.log(`[RUN COMMAND] Executing: ${command}`);
+    logger.info(`[RUN COMMAND] Executing: ${command}`);
 
     const { stdout, stderr } = await execAsync(command, { timeout });
 
-    console.log(`[RUN COMMAND] Successfully executed: ${command}`);
+    if (logger.isDebugEnabled()) {
+      logger.debug('Shell command output', { command, stdout: stdout.trim(), stderr: stderr.trim() });
+    }
+
+    logger.info(`[RUN COMMAND] Successfully executed: ${command}`);
     return {
       success: true,
       message: `Command executed successfully`,
@@ -29,7 +34,7 @@ export async function runShell(
       command: command,
     };
   } catch (error) {
-    console.error(`[RUN COMMAND] Error executing command:`, error);
+    logger.error(`[RUN COMMAND] Error executing command:`, error);
 
     if (error instanceof Error && 'stdout' in error && 'stderr' in error) {
       const execError = error as unknown as {

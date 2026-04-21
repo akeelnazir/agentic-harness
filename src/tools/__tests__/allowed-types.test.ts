@@ -1,11 +1,9 @@
-
 import { allowedTypes, isAllowedType } from '../allowed-types.ts';
 
 describe('allowedTypes', () => {
   it('should contain a comprehensive list of allowed types/files', () => {
-    // Simple check to ensure the array is not empty and has some expected entries
     expect(Array.isArray(allowedTypes)).toBe(true);
-    expect(allowedTypes).toHaveLength(42); // Updated from 40 to match actual count
+    expect(allowedTypes).toHaveLength(42);
   });
 });
 

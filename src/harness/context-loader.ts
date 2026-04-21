@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import type { RepositoryContext } from '../types/types.ts';
+import { logger } from '../utils/logger.ts';
 
 function loadPackageJson(): Partial<RepositoryContext> {
   try {
@@ -54,7 +55,7 @@ export function loadRepositoryContext(): RepositoryContext {
   const pkg = loadPackageJson();
   const typescript = loadTsConfig();
 
-  return {
+  const context: RepositoryContext = {
     name: pkg.name!,
     version: pkg.version!,
     description: pkg.description!,
@@ -64,6 +65,12 @@ export function loadRepositoryContext(): RepositoryContext {
     scripts: pkg.scripts!,
     typescript,
   };
+
+  if (logger.isDebugEnabled()) {
+    logger.debug('Loaded repository context', context);
+  }
+
+  return context;
 }
 
 export function formatRepositoryContext(ctx: RepositoryContext): string {
