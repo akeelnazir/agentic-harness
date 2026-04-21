@@ -1,11 +1,11 @@
-import { mkdir, writeFile, appendFile, access } from 'fs/promises';
+import { mkdir, writeFile, access } from 'fs/promises';
 import { join } from 'path';
 import type { WriteResult } from '../types/types.js';
 
 /**
  * Write content to a markdown file in the 'files' folder
- * Auto-detects if file exists: creates new file or appends to existing
- * @param filename - Name of the file (without .md extension)
+ * Auto-detects if file exists: creates new file or overwrites existing
+ * @param filename - Name of the file
  * @param content - Content to write to the file
  * @returns Promise resolving to WriteResult with operation details
  */
@@ -40,15 +40,15 @@ export async function writeToFile(
     }
 
     if (fileExists) {
-      await appendFile(filePath, `\n${content}`);
+      await writeFile(filePath, `\n${content}`);
       console.log(
-        `[WRITE] Successfully appended to file: ${fullFilename}`
+        `[WRITE] Successfully wrote to file: ${fullFilename}, append not supported, overwriting content.`
       );
       return {
         success: true,
-        message: `Appended content to ${fullFilename}`,
+        message: `Wrote content to existing file: ${fullFilename}`,
         filename: fullFilename,
-        mode: 'appended'
+        mode: 'overwrite'
       };
     } else {
       await writeFile(filePath, content);
@@ -65,8 +65,8 @@ export async function writeToFile(
     const errorMessage = error instanceof Error ? error.message : String(error);
     return {
       success: false,
-      message: `Failed to write file: ${errorMessage}`,
-      filename: filename,
+      message: `Failed to write file: ${filename} - error: ${errorMessage}`,
+      filename,
       mode: 'created'
     };
   }

@@ -51,7 +51,7 @@ export const TOOLS: ChatCompletionTool[] = [
     function: {
       name: 'write_file',
       description:
-        'Write content to a file on the local disk. Use this tool to create or update files.',
+        'Write content to a file on the local disk. Use this tool to create or overwrite files. Appending to existing files is not supported; if the file already exists, it will be overwritten with the new content.',
       parameters: {
         type: 'object',
         properties: {

@@ -12,7 +12,7 @@ export interface WriteResult {
   success: boolean;
   message: string;
   filename: string;
-  mode: 'created' | 'appended';
+  mode: 'created' | 'appended' | 'overwrite';
 }
 
 export interface ToolRequest {
