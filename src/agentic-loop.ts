@@ -1,6 +1,6 @@
 import readline from 'readline';
 import { Harness } from './harness/harness.ts';
-import { logger } from './utils/logger.ts';
+import { logger } from './services/logger.ts';
 
 const rl = readline.createInterface({
   input: process.stdin,

@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import type { RepositoryContext } from '../types/types.ts';
-import { logger } from '../utils/logger.ts';
+import { logger } from '../services/logger.ts';
 
 function loadPackageJson(): Partial<RepositoryContext> {
   try {

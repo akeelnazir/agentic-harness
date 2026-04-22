@@ -4,7 +4,7 @@ import type { ChatCompletionMessageParam } from '../types/types.ts';
 import { LLMHOST_HOST, DEFAULT_MODEL, MAX_ITERATIONS } from '../config.ts';
 import { TOOLS } from '../tools/tools-definition.ts';
 import { systemPrompt } from './system-prompt.ts';
-import { logger } from '../utils/logger.ts';
+import { logger } from '../services/logger.ts';
 
 /**
  * Harness class that combines LLM with tool calling capabilities

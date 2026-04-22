@@ -1,4 +1,4 @@
-import { readFromFile } from '../read-file.ts';
+import { readFromFile } from '../file-reader/read-file.ts';
 import type { ReadResult } from '../../types/types.ts';
 
 describe('readFromFile', () => {

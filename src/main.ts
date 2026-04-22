@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { Harness } from './harness/harness.ts';
 import { agenticLoop } from './agentic-loop.ts';
-import { logger } from './utils/logger.ts';
+import { logger } from './services/logger.ts';
 
 dotenv.config();
 

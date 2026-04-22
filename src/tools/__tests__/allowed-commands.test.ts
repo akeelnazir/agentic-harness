@@ -1,4 +1,4 @@
-import { isAllowedShellCommand } from '../allowed-commands.ts';
+import { isAllowedShellCommand } from '../run-shell/allowed-commands.ts';
 
 describe('isAllowedShellCommand', () => {
   it('should allow basic allowed commands', () => {

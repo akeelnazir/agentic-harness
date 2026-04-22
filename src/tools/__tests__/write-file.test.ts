@@ -1,4 +1,4 @@
-import { writeToFile } from '../write-file.ts';
+import { writeToFile } from '../file-writer/write-file.ts';
 import { mkdir, writeFile, access } from 'fs/promises';
 
 jest.mock('fs/promises');

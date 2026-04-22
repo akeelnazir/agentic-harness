@@ -1,8 +1,8 @@
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
-import type { ReadResult } from '../types/types.ts';
+import type { ReadResult } from '../../types/types.ts';
 import { allowedTypes, isAllowedType } from './allowed-types.ts';
-import { logger } from '../utils/logger.ts';
+import { logger } from '../../services/logger.ts';
 
 /**
  * Read content from a file

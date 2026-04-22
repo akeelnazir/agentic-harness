@@ -1,7 +1,7 @@
 import { exec } from 'child_process';
 import { promisify } from 'util';
-import type { RunShellResult } from '../types/types.ts';
-import { logger } from '../utils/logger.ts';
+import type { RunShellResult } from '../../types/types.ts';
+import { logger } from '../../services/logger.ts';
 
 const execAsync = promisify(exec);
 

@@ -1,11 +1,11 @@
 import { executeTool } from '../tool-executor.ts';
-import { readFromFile } from '../read-file.ts';
-import { runShell } from '../run-shell.ts';
-import { writeToFile } from '../write-file.ts';
+import { readFromFile } from '../file-reader/read-file.ts';
+import { runShell } from '../run-shell/run-shell.ts';
+import { writeToFile } from '../file-writer/write-file.ts';
 
-jest.mock('../read-file.ts');
-jest.mock('../run-shell.ts');
-jest.mock('../write-file.ts');
+jest.mock('../file-reader/read-file.ts');
+jest.mock('../run-shell/run-shell.ts');
+jest.mock('../file-writer/write-file.ts');
 
 const mockedReadFromFile = jest.mocked(readFromFile);
 const mockedRunShell = jest.mocked(runShell);

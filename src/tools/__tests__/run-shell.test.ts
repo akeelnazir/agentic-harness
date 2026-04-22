@@ -1,4 +1,4 @@
-import { runShell } from '../run-shell.ts';
+import { runShell } from '../run-shell/run-shell.ts';
 
 describe('runShell', () => {
   it('should execute command successfully and return success result', async () => {

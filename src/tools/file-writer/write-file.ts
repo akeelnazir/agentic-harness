@@ -1,7 +1,7 @@
 import { mkdir, writeFile, access } from 'fs/promises';
 import { join } from 'path';
-import type { WriteResult } from '../types/types.js';
-import { logger } from '../utils/logger.ts';
+import type { WriteResult } from '../../types/types.ts';
+import { logger } from '../../services/logger.ts';
 
 /**
  * Write content to a markdown file in the 'files' folder

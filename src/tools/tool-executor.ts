@@ -1,8 +1,8 @@
-import { readFromFile } from './read-file.ts';
-import { runShell } from './run-shell.ts';
-import { isAllowedShellCommand } from './allowed-commands.ts';
-import { writeToFile } from './write-file.ts';
-import { logger } from '../utils/logger.ts';
+import { readFromFile } from './file-reader/read-file.ts';
+import { runShell } from './run-shell/run-shell.ts';
+import { isAllowedShellCommand } from './run-shell/allowed-commands.ts';
+import { writeToFile } from './file-writer/write-file.ts';
+import { logger } from '../services/logger.ts';
 
 /**
  * Execute a tool call by name and return the result string
