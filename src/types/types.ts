@@ -46,3 +46,9 @@ export interface RunShellResult {
   exitCode: number | null;
   command: string;
 }
+
+export interface SearchResult {
+  title: string;
+  url: string;
+  description: string;
+}

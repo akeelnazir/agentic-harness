@@ -64,6 +64,10 @@ export const allowedBaseCommands: string[] = [
 
   // Folder operations
   'mkdir',
+
+  // Web search
+  'curl',
+  'wget',
 ];
 
 // Forbidden argument patterns — matched against the full command string.
@@ -98,8 +102,8 @@ export const forbiddenPatterns: RegExp[] = [
   /\bufw\b/,
 
   // Network exfiltration
-  /\bcurl\b/,
-  /\bwget\b/,
+  // /\bcurl\b/,
+  // /\bwget\b/,
   /\bnc\b/,
   /\bnetcat\b/,
   /\bssh\b/,

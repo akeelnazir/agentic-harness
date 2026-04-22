@@ -3,6 +3,7 @@ import { runShell } from './run-shell/run-shell.ts';
 import { isAllowedShellCommand } from './run-shell/allowed-commands.ts';
 import { writeToFile } from './file-writer/write-file.ts';
 import { logger } from '../services/logger.ts';
+import { webSearch } from './web-search/web-search.ts';
 
 /**
  * Execute a tool call by name and return the result string
@@ -47,6 +48,14 @@ export async function executeTool(name: string, args: string): Promise<string> {
       return writeResult.success
         ? `File written successfully: ${writeResult.filename}`
         : `Failed to write file: ${writeResult.message}`;
+
+    case 'web_search':
+      const { query } = JSON.parse(args) as { query: string };
+      logger.info(`[WEB SEARCH] Executing search for: "${query}"`);
+      const searchResult = await webSearch(query);
+      return searchResult.length > 0
+        ? `Search results: ${searchResult.map((r: { title: string }) => r.title).join(', ')}`
+        : 'No search results found';
 
     default:
       return `Unknown tool: ${name}`;

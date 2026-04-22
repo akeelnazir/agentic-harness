@@ -10,3 +10,4 @@ export const MAX_ITERATIONS = process.env.MAX_ITERATIONS
   : 5;
 export const LOG_LEVEL = process.env.LOG_LEVEL || 'INFO';
 export const LOG_FILE = process.env.LOG_FILE || 'agentic-harness.log';
+export const SERPAPI_KEY = process.env.SERPAPI_KEY || '';

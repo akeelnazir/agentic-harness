@@ -70,4 +70,24 @@ export const TOOLS: ChatCompletionTool[] = [
       strict: true,
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'web_search',
+      description:
+        'Search the web for information. Use this tool to get current information about people, companies, entities, news, or general knowledge (science, history, etc.).',
+      parameters: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description:
+              'The search query. For example, "History of UK" or "how to use TypeScript".',
+          },
+        },
+        required: ['query'],
+      },
+      strict: true,
+    },
+  },
 ];
