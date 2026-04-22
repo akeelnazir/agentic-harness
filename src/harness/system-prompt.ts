@@ -1,12 +1,19 @@
 import {
-  loadRepositoryContext,
-  formatRepositoryContext,
+    loadRepositoryContext,
+    formatRepositoryContext,
 } from './context-loader.ts';
 
-const repoContext = loadRepositoryContext();
-const repoContextStr = formatRepositoryContext(repoContext);
+let cachedSystemPrompt: string | null = null;
 
-export const systemPrompt = `You are a helpful assistant with disk-reading tools.
+function generateSystemPrompt(): string {
+    if (cachedSystemPrompt) {
+        return cachedSystemPrompt;
+    }
+
+    const repoContext = loadRepositoryContext();
+    const repoContextStr = formatRepositoryContext(repoContext);
+
+    cachedSystemPrompt = `You are a helpful assistant with disk-reading tools.
 
 ## Repository Context:
 ${repoContextStr}
@@ -111,3 +118,8 @@ A brief assessment of the company's current online presence and clarity of messa
 - **Evidence-based answers.** Derive all responses from tool outputs and file contents; do not speculate.
 - **Complete context.** If a response requires understanding multiple files, read all of them before formulating an answer.
 - **Convention compliance.** Mirror the project's existing tooling (test runner, build system, linter). Propose 'package.json' modifications only when a necessary dependency is absent.`;
+
+    return cachedSystemPrompt;
+}
+
+export const systemPrompt = generateSystemPrompt();

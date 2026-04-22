@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { executeTool } from '../tools/tool-executor.ts';
 import type { ChatCompletionMessageParam } from '../types/types.ts';
-import { LLMHOST_HOST, DEFAULT_MODEL, MAX_ITERATIONS, OPENROUTER_API_KEY } from '../config.ts';
+import { LLMHOST_HOST, DEFAULT_MODEL, MAX_ITERATIONS, OPENROUTER_API_KEY, INPUT_TOKEN_PRICE_PER_MILLION, OUTPUT_TOKEN_PRICE_PER_MILLION, MAX_MESSAGES_TO_KEEP } from '../config.ts';
 import { TOOLS } from '../tools/tools-definition.ts';
 import { systemPrompt } from './system-prompt.ts';
 import { logger } from '../services/logger.ts';
@@ -30,6 +30,29 @@ export class Harness {
   }
 
   /**
+   * Prune messages to keep only recent context and avoid excessive token usage
+   * Keeps the system message and user query, then keeps the most recent messages
+   */
+  private pruneMessages(messages: Array<ChatCompletionMessageParam>): Array<ChatCompletionMessageParam> {
+    if (messages.length <= MAX_MESSAGES_TO_KEEP) {
+      return messages;
+    }
+
+    const systemMsg = messages[0]!;
+    const userMsg = messages[1]!;
+    const recentMessages = messages.slice(-MAX_MESSAGES_TO_KEEP + 2);
+
+    const prunedMessages: Array<ChatCompletionMessageParam> = [systemMsg, userMsg, ...recentMessages];
+    const tokensRemoved = messages.length - prunedMessages.length;
+
+    if (logger.isDebugEnabled()) {
+      logger.debug(`Pruned messages: removed ${tokensRemoved} old messages, keeping ${prunedMessages.length} total`);
+    }
+
+    return prunedMessages;
+  }
+
+  /**
    * Process a query using LLMHOST with LLM-driven tool calling
    */
   async processQuery(query: string): Promise<string> {
@@ -39,6 +62,8 @@ export class Harness {
     ];
     const maxIterations = MAX_ITERATIONS;
     let iterations = 0;
+    let totalInputTokens = 0;
+    let totalOutputTokens = 0;
 
     logger.info(`[QUERY START] Processing: "${query}"`);
     logger.info(`[MODEL] Using: ${this.model}`);
@@ -49,17 +74,32 @@ export class Harness {
 
       try {
         logger.info(`[LLMHOST REQUEST] Sending prompt to model...`);
+        const prunedMessages = this.pruneMessages(messages);
         if (logger.isDebugEnabled()) {
-          logger.debug('LLM request', { model: this.model, messages });
+          logger.debug('LLM request', { model: this.model, messages: prunedMessages });
         }
         const response = await this.client.chat.completions.create({
           model: this.model,
-          messages: messages,
+          messages: prunedMessages,
           tools: TOOLS,
           parallel_tool_calls: true,
           temperature: 0.2,
           stream: false,
         });
+        
+        const inputTokens = response.usage?.prompt_tokens || 0;
+        const outputTokens = response.usage?.completion_tokens || 0;
+        totalInputTokens += inputTokens;
+        totalOutputTokens += outputTokens;
+        
+        const iterationCost = (inputTokens * INPUT_TOKEN_PRICE_PER_MILLION / 1000000) + (outputTokens * OUTPUT_TOKEN_PRICE_PER_MILLION / 1000000);
+        const totalCost = (totalInputTokens * INPUT_TOKEN_PRICE_PER_MILLION / 1000000) + (totalOutputTokens * OUTPUT_TOKEN_PRICE_PER_MILLION / 1000000);
+        
+        logger.info(
+          `[LLMHOST RESPONSE] tokens used this iteration: ${inputTokens + outputTokens} (input: ${inputTokens}, output: ${outputTokens}), cost: $${iterationCost.toFixed(6)}` +
+          `\n[LLMHOST RESPONSE] total tokens used so far: ${totalInputTokens + totalOutputTokens} tokens (input: ${totalInputTokens}, output: ${totalOutputTokens})` +
+          `\n[LLMHOST RESPONSE] total cost: $${totalCost.toFixed(6)}`
+        );
 
         const choice = response.choices[0];
         if (!choice) throw new Error('No choices returned from model');
