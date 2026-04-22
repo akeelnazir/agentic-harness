@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import { executeTool } from '../tools/tool-executor.ts';
 import type { ChatCompletionMessageParam } from '../types/types.ts';
-import { LLMHOST_HOST, DEFAULT_MODEL, MAX_ITERATIONS } from '../config.ts';
+import { LLMHOST_HOST, DEFAULT_MODEL, MAX_ITERATIONS, OPENROUTER_API_KEY } from '../config.ts';
 import { TOOLS } from '../tools/tools-definition.ts';
 import { systemPrompt } from './system-prompt.ts';
 import { logger } from '../services/logger.ts';
@@ -16,9 +16,11 @@ export class Harness {
   constructor(model: string = DEFAULT_MODEL) {
     this.client = new OpenAI({
       baseURL: LLMHOST_HOST,
-      apiKey: 'not-needed',
+      apiKey: OPENROUTER_API_KEY,
     });
+
     this.model = model;
+
     if (logger.isDebugEnabled()) {
       logger.debug('Harness initialized', {
         model: this.model,
@@ -35,8 +37,8 @@ export class Harness {
       { role: 'system', content: systemPrompt },
       { role: 'user', content: query },
     ];
-    let iterations = 0;
     const maxIterations = MAX_ITERATIONS;
+    let iterations = 0;
 
     logger.info(`[QUERY START] Processing: "${query}"`);
     logger.info(`[MODEL] Using: ${this.model}`);
