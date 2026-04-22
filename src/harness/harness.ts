@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { writeFile } from 'fs/promises';
 import { executeTool } from '../tools/tool-executor.ts';
 import type { ChatCompletionMessageParam } from '../types/types.ts';
 import { LLMHOST_HOST, DEFAULT_MODEL, MAX_ITERATIONS, OPENROUTER_API_KEY, INPUT_TOKEN_PRICE_PER_MILLION, OUTPUT_TOKEN_PRICE_PER_MILLION, MAX_MESSAGES_TO_KEEP } from '../config.ts';
@@ -77,6 +78,7 @@ export class Harness {
         const prunedMessages = this.pruneMessages(messages);
         if (logger.isDebugEnabled()) {
           logger.debug('LLM request', { model: this.model, messages: prunedMessages });
+          writeFile(`messages-${iterations}.log`, JSON.stringify({ messages: prunedMessages }, null, 2));
         }
         const response = await this.client.chat.completions.create({
           model: this.model,

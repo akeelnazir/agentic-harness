@@ -3,7 +3,7 @@ import { allowedTypes, isAllowedType } from '../file-reader/allowed-types.ts';
 describe('allowedTypes', () => {
   it('should contain a comprehensive list of allowed types/files', () => {
     expect(Array.isArray(allowedTypes)).toBe(true);
-    expect(allowedTypes).toHaveLength(42);
+    expect(allowedTypes).toHaveLength(47);
   });
 });
 
