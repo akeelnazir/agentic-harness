@@ -103,8 +103,11 @@ export class Harness {
           `\n[LLMHOST RESPONSE] total cost: $${totalCost.toFixed(6)}`
         );
 
-        const choice = response.choices[0];
-        if (!choice) throw new Error('No choices returned from model');
+        if (!response?.choices || response.choices.length === 0) {
+          throw new Error('No choices returned from model');
+        }
+
+        const choice = response.choices[0]!;
         const message = choice.message;
 
         logger.info(
