@@ -2,10 +2,13 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const LLMHOST_HOST =
-  process.env.LLMHOST_HOST || 'http://127.0.0.1:1234/v1';
-export const DEFAULT_MODEL = process.env.DEFAULT_MODEL || 'nvidia/nemotron-3-nano-4b';
+export const LLM_PROVIDER = process.env.LLM_PROVIDER || 'lmstudio';
+export const OPENAI_API_KEY = process.env.OPENAI_API_KEY || '';
+export const OPENAI_ORG_ID = process.env.OPENAI_ORG_ID || '';
+export const OPENAI_PROJECT_ID = process.env.OPENAI_PROJECT_ID || '';
 export const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
+export const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
+export const DEFAULT_MODEL = process.env.DEFAULT_MODEL || 'nvidia/nemotron-3-nano-4b';
 
 export const MAX_ITERATIONS = process.env.MAX_ITERATIONS
   ? parseInt(process.env.MAX_ITERATIONS, 10)
