@@ -127,26 +127,18 @@ export class Harness {
           `[TOOL CALLS] ${response.toolCalls.length} tool call(s) requested`
         );
 
-        // Add assistant response to messages with tool use blocks
-        const assistantContent: any[] = [];
-        if (response.content) {
-          assistantContent.push({
-            type: 'text',
-            text: response.content,
-          });
-        }
-        for (const toolCall of response.toolCalls) {
-          assistantContent.push({
-            type: 'tool_use',
-            id: toolCall.id,
-            name: toolCall.name,
-            input: JSON.parse(toolCall.arguments),
-          });
-        }
-
+        // Add assistant response to messages with tool calls (OpenAI format)
         messages.push({
           role: 'assistant',
-          content: assistantContent,
+          content: response.content || null,
+          tool_calls: response.toolCalls.map((tc) => ({
+            id: tc.id,
+            type: 'function' as const,
+            function: {
+              name: tc.name,
+              arguments: tc.arguments,
+            },
+          })),
         });
 
         // Execute tools and collect results
@@ -168,7 +160,7 @@ export class Harness {
           messages.push({
             role: 'tool',
             tool_call_id: id,
-            content: toolResult,
+            content: typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult),
           });
         }
 

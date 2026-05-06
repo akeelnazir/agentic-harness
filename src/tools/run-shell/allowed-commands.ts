@@ -1,3 +1,11 @@
+import { resolve, normalize } from 'path';
+
+// Commands that accept filesystem path arguments and must be confined to CWD
+const PATH_AWARE_COMMANDS: string[] = [
+  'ls', 'cat', 'find', 'grep', 'rg', 'head', 'tail', 'wc', 'stat',
+  'tree', 'file', 'sed', 'awk', 'cut', 'du', 'sort', 'uniq', 'mkdir',
+];
+
 // Allowed base executables — the command must start with one of these
 export const allowedBaseCommands: string[] = [
   // Filesystem navigation & inspection
@@ -127,7 +135,10 @@ export const forbiddenPatterns: RegExp[] = [
   />\s*\/bin\//, // redirecting into /bin
 ];
 
-export function isAllowedShellCommand(command: string): {
+export function isAllowedShellCommand(
+  command: string,
+  cwd: string = process.cwd()
+): {
   allowed: boolean;
   reason?: string;
 } {
@@ -146,6 +157,49 @@ export function isAllowedShellCommand(command: string): {
       return {
         allowed: false,
         reason: `Command matches forbidden pattern: ${pattern}`,
+      };
+    }
+  }
+
+  if (PATH_AWARE_COMMANDS.includes(baseCommand)) {
+    const confinementResult = checkPathConfinement(trimmed, cwd);
+    if (!confinementResult.allowed) {
+      return confinementResult;
+    }
+  }
+
+  return { allowed: true };
+}
+
+/**
+ * Checks that all path-like tokens in a command are confined to the given root directory.
+ * Rejects absolute paths outside root and any parent traversal (../).
+ */
+export function checkPathConfinement(
+  command: string,
+  root: string = process.cwd()
+): { allowed: boolean; reason?: string } {
+  const normalizedRoot = normalize(resolve(root));
+  const tokens = command.split(/\s+/).slice(1);
+
+  for (const token of tokens) {
+    if (token.startsWith('-')) continue;
+
+    const looksLikePath =
+      token.startsWith('/') ||
+      token.startsWith('./') ||
+      token.startsWith('../') ||
+      token === '..' ||
+      token.includes('/');
+
+    if (!looksLikePath) continue;
+
+    const resolved = normalize(resolve(normalizedRoot, token));
+
+    if (!resolved.startsWith(normalizedRoot + '/') && resolved !== normalizedRoot) {
+      return {
+        allowed: false,
+        reason: `Path '${token}' resolves outside the working directory ('${normalizedRoot}')`,
       };
     }
   }
