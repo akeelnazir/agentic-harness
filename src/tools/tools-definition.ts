@@ -73,6 +73,58 @@ export const TOOLS: ChatCompletionTool[] = [
   {
     type: 'function',
     function: {
+      name: 'person_search',
+      description:
+        'Search for a person in the UK using the 192.com database. Returns name, address, phone number, and date of birth where available.',
+      parameters: {
+        type: 'object',
+        properties: {
+          first_name: {
+            type: 'string',
+            description: 'The first name of the person to search for.',
+          },
+          last_name: {
+            type: 'string',
+            description: 'The last name of the person to search for.',
+          },
+          location: {
+            type: 'string',
+            description:
+              'Optional town name or postcode to narrow the search to a specific area.',
+          },
+        },
+        required: ['first_name', 'last_name'],
+      },
+      strict: false,
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'company_search',
+      description:
+        'Search for a UK company in the 192.com database. Returns company name, registration number, registered address, status, and incorporation date where available.',
+      parameters: {
+        type: 'object',
+        properties: {
+          company_name: {
+            type: 'string',
+            description: 'The name of the company to search for.',
+          },
+          registration_number: {
+            type: 'string',
+            description:
+              'Optional Companies House registration number to narrow the search.',
+          },
+        },
+        required: ['company_name'],
+      },
+      strict: false,
+    },
+  },
+  {
+    type: 'function',
+    function: {
       name: 'web_search',
       description:
         'Search the web for information. Use this tool to get current information about people, companies, entities, news, or general knowledge (science, history, etc.).',

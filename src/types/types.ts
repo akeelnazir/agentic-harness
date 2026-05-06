@@ -52,3 +52,19 @@ export interface SearchResult {
   url: string;
   description: string;
 }
+
+export interface PersonSearchResult {
+  firstName: string;
+  lastName: string;
+  address: string;
+  phone: string;
+  dateOfBirth: string;
+}
+
+export interface CompanySearchResult {
+  companyName: string;
+  registrationNumber: string;
+  address: string;
+  status: string;
+  incorporationDate: string;
+}
