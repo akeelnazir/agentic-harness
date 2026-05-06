@@ -1,12 +1,11 @@
 import { writeFile } from 'fs/promises';
-import { executeTool } from '../tools/tool-executor.ts';
 import type { ChatCompletionMessageParam } from '../types/types.ts';
-import { DEFAULT_MODEL, MAX_ITERATIONS, INPUT_TOKEN_PRICE_PER_MILLION, OUTPUT_TOKEN_PRICE_PER_MILLION, MAX_MESSAGES_TO_KEEP, LLM_PROVIDER } from '../config.ts';
-import { TOOLS } from '../tools/tools-definition.ts';
+import { DEFAULT_MODEL, MAX_ITERATIONS, INPUT_TOKEN_PRICE_PER_MILLION, OUTPUT_TOKEN_PRICE_PER_MILLION, MAX_MESSAGES_TO_KEEP, LLM_PROVIDER, MCP_SERVERS } from '../config.ts';
 import { systemPrompt } from './system-prompt.ts';
 import { logger } from '../services/logger.ts';
 import { AdapterFactory } from '../llm/adapter-factory.ts';
 import type { LLMAdapter, LLMTool } from '../llm/llm-adapter.ts';
+import { MCPClientManager } from '../mcp/mcp-client.ts';
 
 /**
  * Harness class that combines LLM with tool calling capabilities
@@ -14,10 +13,13 @@ import type { LLMAdapter, LLMTool } from '../llm/llm-adapter.ts';
 export class Harness {
   private llmAdapter: LLMAdapter;
   private model: string;
+  private mcpClient: MCPClientManager;
+  private initialized = false;
 
   constructor(model: string = DEFAULT_MODEL) {
     this.model = model;
     this.llmAdapter = AdapterFactory.createAdapter(model);
+    this.mcpClient = new MCPClientManager();
 
     if (logger.isDebugEnabled()) {
       logger.debug('Harness initialized', {
@@ -25,6 +27,25 @@ export class Harness {
         provider: LLM_PROVIDER,
       });
     }
+  }
+
+  /**
+   * Initialize the harness and connect to MCP servers
+   */
+  async initialize(): Promise<void> {
+    if (this.initialized) return;
+
+    // Connect to MCP servers if configured
+    if (Object.keys(MCP_SERVERS).length > 0) {
+      logger.info(`[MCP] Initializing ${Object.keys(MCP_SERVERS).length} MCP server(s)...`);
+      await this.mcpClient.initialize(MCP_SERVERS);
+      const toolCount = this.mcpClient.getAllTools().length;
+      logger.info(`[MCP] Connected with ${this.mcpClient.getConnectedCount()} server(s), ${toolCount} total tool(s) available`);
+    } else {
+      logger.info('[MCP] No MCP servers configured');
+    }
+
+    this.initialized = true;
   }
 
   /**
@@ -54,6 +75,9 @@ export class Harness {
    * Process a query using LLM with tool calling capabilities
    */
   async processQuery(query: string): Promise<string> {
+    // Ensure harness is initialized
+    await this.initialize();
+
     const messages: Array<ChatCompletionMessageParam> = [
       { role: 'user', content: query },
     ];
@@ -66,17 +90,13 @@ export class Harness {
     logger.info(`[QUERY START] Processing: "${query}"`);
     logger.info(`[MODEL] Using: ${this.model}`);
 
-    // Convert tools to adapter format
-    const adapterTools: LLMTool[] = TOOLS.map((tool) => {
-      if (tool.type !== 'function') {
-        throw new Error('Only function tools are supported');
-      }
-      return {
-        name: tool.function.name,
-        description: tool.function.description || '',
-        inputSchema: tool.function.parameters as Record<string, unknown>,
-      };
-    });
+    // Get tools from MCP servers
+    const adapterTools: LLMTool[] = this.mcpClient.getAllTools();
+    if (adapterTools.length === 0) {
+      logger.warn('[MCP] No tools available from MCP servers');
+    } else if (logger.isDebugEnabled()) {
+      logger.debug(`[MCP] Available tools: ${adapterTools.map((t) => t.name).join(', ')}`);
+    }
 
     while (iterations < maxIterations) {
       iterations++;
@@ -148,7 +168,7 @@ export class Harness {
             `[TOOL CALL] id=${id} name=${name} args=${args}`
           );
 
-          const toolResult = await executeTool(name, args);
+          const toolResult = await this.mcpClient.executeTool(name, args);
           if (logger.isDebugEnabled()) {
             logger.debug('Tool result', {
               id,
@@ -176,5 +196,12 @@ export class Harness {
     }
 
     throw new Error('Maximum tool call iterations reached');
+  }
+
+  /**
+   * Cleanup - disconnect from all MCP servers
+   */
+  async cleanup(): Promise<void> {
+    await this.mcpClient.disconnect();
   }
 }

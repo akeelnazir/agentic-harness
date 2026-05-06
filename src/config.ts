@@ -30,3 +30,21 @@ export const OUTPUT_TOKEN_PRICE_PER_MILLION = process.env.OUTPUT_TOKEN_PRICE_PER
 export const MAX_MESSAGES_TO_KEEP = process.env.MAX_MESSAGES_TO_KEEP
   ? parseInt(process.env.MAX_MESSAGES_TO_KEEP, 10)
   : 20;
+
+/**
+ * Parse MCP server configuration from environment variable
+ * Format: {"serverName": {"type": "stdio", "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path"]}}
+ */
+function parseMCPServers(): Record<string, { type: 'stdio' | 'sse'; command?: string; args?: string[]; url?: string; env?: Record<string, string> }> {
+  if (!process.env.MCP_SERVERS) {
+    return {};
+  }
+  try {
+    return JSON.parse(process.env.MCP_SERVERS);
+  } catch {
+    console.warn('Failed to parse MCP_SERVERS environment variable');
+    return {};
+  }
+}
+
+export const MCP_SERVERS = parseMCPServers();

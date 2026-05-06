@@ -7,14 +7,17 @@ const rl = readline.createInterface({
   output: process.stdout,
 });
 
-export const agenticLoop = (harness: Harness) => {
-  rl.question('You: ', (answer: string) => {
+export const agenticLoop = (harness: Harness, cleanup?: () => void | Promise<void>) => {
+  rl.question('You: ', async (answer: string) => {
     if (logger.isDebugEnabled()) {
       logger.debug('User input received', { input: answer });
     }
     const response = answer.toLowerCase();
     if (response === 'quit' || response === 'exit' || response === 'bye') {
       rl.close();
+      if (cleanup) {
+        await cleanup();
+      }
       return;
     }
 

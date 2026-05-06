@@ -8,10 +8,23 @@ dotenv.config();
 async function main() {
   const harness = new Harness();
 
+  // Initialize harness (connects to MCP servers)
+  await harness.initialize();
+
   logger.info('Harness initialized');
   logger.info('Type "quit" or "exit" or "bye" to exit\n');
 
-  agenticLoop(harness);
+  // Handle cleanup on exit
+  const cleanup = async () => {
+    logger.info('Shutting down...');
+    await harness.cleanup?.();
+    process.exit(0);
+  };
+
+  process.on('SIGINT', cleanup);
+  process.on('SIGTERM', cleanup);
+
+  agenticLoop(harness, cleanup);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
