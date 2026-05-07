@@ -38,11 +38,32 @@ export class AnthropicAdapter extends LLMAdapter {
           };
         }
         if (msg.role === 'assistant') {
-          // Handle assistant messages - can be string or array of content blocks
-          const content = Array.isArray(msg.content) ? msg.content : msg.content;
+          // Build content blocks array for Anthropic format
+          const contentBlocks: any[] = [];
+
+          // Add text content if present
+          if (msg.content) {
+            contentBlocks.push({
+              type: 'text',
+              text: msg.content as string,
+            });
+          }
+
+          // Convert OpenAI tool_calls to Anthropic tool_use blocks
+          if ((msg as any).tool_calls) {
+            for (const toolCall of (msg as any).tool_calls) {
+              contentBlocks.push({
+                type: 'tool_use',
+                id: toolCall.id,
+                name: toolCall.function.name,
+                input: JSON.parse(toolCall.function.arguments),
+              });
+            }
+          }
+
           return {
             role: 'assistant' as const,
-            content: content,
+            content: contentBlocks,
           };
         }
         return {

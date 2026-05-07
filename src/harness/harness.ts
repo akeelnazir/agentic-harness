@@ -29,18 +29,31 @@ export class Harness {
 
   /**
    * Prune messages to keep only recent context and avoid excessive token usage
-   * Keeps the system message and user query, then keeps the most recent messages
+   * Keeps the original user query and most recent conversation, preserving tool_use/tool_result pairs
    */
   private pruneMessages(messages: Array<ChatCompletionMessageParam>): Array<ChatCompletionMessageParam> {
     if (messages.length <= MAX_MESSAGES_TO_KEEP) {
       return messages;
     }
 
-    const systemMsg = messages[0]!;
-    const userMsg = messages[1]!;
-    const recentMessages = messages.slice(-MAX_MESSAGES_TO_KEEP + 2);
+    // messages[0] is the original user query (system prompt is passed separately)
+    const originalQuery = messages[0]!;
 
-    const prunedMessages: Array<ChatCompletionMessageParam> = [systemMsg, userMsg, ...recentMessages];
+    // Get recent messages but ensure we don't break tool_use/tool_result pairs
+    // A tool_result must always have its corresponding tool_use in the previous message
+    let recentMessages = messages.slice(-MAX_MESSAGES_TO_KEEP + 1);
+
+    // Check if recentMessages starts with a tool message (which would be orphaned)
+    // If so, we need to include the preceding assistant message with tool_calls
+    if (recentMessages.length > 0 && recentMessages[0]!.role === 'tool') {
+      // Find the assistant message that made this tool call
+      const cutoffIndex = messages.length - recentMessages.length;
+      if (cutoffIndex > 0 && messages[cutoffIndex - 1]!.role === 'assistant') {
+        recentMessages = [messages[cutoffIndex - 1]!, ...recentMessages];
+      }
+    }
+
+    const prunedMessages: Array<ChatCompletionMessageParam> = [originalQuery, ...recentMessages];
     const tokensRemoved = messages.length - prunedMessages.length;
 
     if (logger.isDebugEnabled()) {
